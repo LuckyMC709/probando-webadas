@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo ubicación automática - Falahbar.SnkS</title>
+  <style>
+    :root {
+      --marron: #8B5E34;
+      --marron-oscuro: #5C3D22;
+      --dorado: #B8944D;
+      --beige: #F5E9D4;
+      --fondo: #FFFBF5;
+      --texto: #4A3B2E;
+      --borde: #E0D0B8;
+      --whatsapp: #25D366;
+      --error: #c0392b;
+      --ok: #15803d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(60, 42, 27, 0.14);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--marron), var(--marron-oscuro));
+      color: #fff;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.55rem;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      color: var(--beige);
+      font-size: 0.95rem;
+    }
+
+    .content {
+      padding: 24px;
+    }
+
+    .box {
+      background: var(--beige);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      color: var(--marron);
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(139, 94, 52, 0.18);
+      font-size: 0.95rem;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      font-weight: bold;
+      color: var(--marron-oscuro);
+      font-size: 1.1rem;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: var(--marron-oscuro);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--texto);
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: 3px solid rgba(184, 148, 77, 0.22);
+      border-color: var(--dorado);
+    }
+
+    button,
+    a.button-link {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: none;
+      text-align: center;
+      display: inline-block;
+      font-family: inherit;
+    }
+
+    .btn-location {
+      width: 100%;
+      background: var(--dorado);
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .btn-whatsapp {
+      width: 100%;
+      background: var(--whatsapp);
+      color: #fff;
+      margin-top: 12px;
+      font-size: 1rem;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      background: #eee0cc;
+      color: var(--marron-oscuro);
+      margin-top: 8px;
+    }
+
+    .status {
+      font-size: 0.9rem;
+      margin: 8px 0 12px;
+      min-height: 22px;
+      font-weight: bold;
+      line-height: 1.35;
+    }
+
+    .status.ok {
+      color: var(--ok);
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .map-link {
+      display: none;
+      margin: 8px 0 14px;
+      color: var(--marron);
+      font-weight: bold;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .help {
+      font-size: 0.86rem;
+      color: #7c6a5a;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .preview {
+      margin-top: 18px;
+      background: #fffaf2;
+      border: 1px dashed var(--borde);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+      color: #5c4634;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .warning {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #7c2d12;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .content {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <section class="header">
+      <h1>Falahbar.SnkS</h1>
+      <p>Demo: link de Google Maps automático en el WhatsApp</p>
+    </section>
+
+    <section class="content">
+      <div class="box">
+        <h2>Pedido de ejemplo</h2>
+        <div class="order-item">
+          <span>2x Alfajor Triple Chocolate</span>
+          <span>$5.000</span>
+        </div>
+        <div class="order-item">
+          <span>1x Coca-Cola 500ml</span>
+          <span>$1.500</span>
+        </div>
+        <div class="total">
+          <span>Total</span>
+          <span>$6.500</span>
+        </div>
+      </div>
+
+      <div class="warning" id="secureWarning" hidden>
+        Para obtener ubicación automática, esta página tiene que estar en HTTPS o localhost. En GitHub Pages funciona porque usa HTTPS.
+      </div>
+
+      <div class="shipping-box">
+        <h2>Datos para el envío</h2>
+
+        <div class="field">
+          <label for="clientName">Nombre</label>
+          <input id="clientName" type="text" placeholder="Ej: Juan" autocomplete="name" />
+        </div>
+
+        <button class="btn-location" id="useLocationBtn" type="button">
+          📍 Usar mi ubicación actual
+        </button>
+
+        <p class="status" id="locationStatus">Todavía no compartiste tu ubicación.</p>
+
+        <a class="map-link" id="mapLink" href="#" target="_blank" rel="noopener">
+          Ver ubicación generada en Google Maps
+        </a>
+
+        <div class="field">
+          <label for="address">Dirección escrita, por si querés aclarar</label>
+          <input id="address" type="text" placeholder="Ej: Barrio Centro, San Martín 123" autocomplete="street-address" />
+          <p class="help">Esto es opcional si ya usaste ubicación automática, pero ayuda al reparto.</p>
+        </div>
+
+        <div class="field">
+          <label for="reference">Referencia</label>
+          <textarea id="reference" placeholder="Ej: Casa con portón negro, al lado de una despensa"></textarea>
+        </div>
+
+        <button class="btn-whatsapp" id="sendBtn" type="button">
+          Enviar pedido por WhatsApp
+        </button>
+
+        <button class="btn-secondary" id="clearLocationBtn" type="button">
+          Limpiar ubicación
+        </button>
+
+        <div class="preview" id="preview"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const WHATSAPP_NUMBER = '5493804653294';
+
+    const fakeCart = [
+      { name: 'Alfajor Triple Chocolate', qty: 2, price: 2500 },
+      { name: 'Coca-Cola 500ml', qty: 1, price: 1500 }
+    ];
+
+    let googleMapsLink = '';
+
+    const clientNameInput = document.getElementById('clientName');
+    const addressInput = document.getElementById('address');
+    const referenceInput = document.getElementById('reference');
+    const useLocationBtn = document.getElementById('useLocationBtn');
+    const clearLocationBtn = document.getElementById('clearLocationBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const locationStatus = document.getElementById('locationStatus');
+    const mapLink = document.getElementById('mapLink');
+    const preview = document.getElementById('preview');
+    const secureWarning = document.getElementById('secureWarning');
+
+    function isLocalhost() {
+      return ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    }
+
+    if (!window.isSecureContext && !isLocalhost()) {
+      secureWarning.hidden = false;
+    }
+
+    function formatMoney(value) {
+      return '$' + value.toLocaleString('es-AR');
+    }
+
+    function getTotal() {
+      return fakeCart.reduce((total, item) => total + item.qty * item.price, 0);
+    }
+
+    function buildMessage() {
+      const clientName = clientNameInput.value.trim() || 'Sin nombre';
+      const address = addressInput.value.trim();
+      const reference = referenceInput.value.trim();
+
+      const productsText = fakeCart
+        .map(item => `- ${item.qty}x ${item.name} - ${formatMoney(item.qty * item.price)}`)
+        .join('
+');
+
+      return `Hola Falahbar.SnkS! Quiero hacer este pedido:
+
+` +
+        `Cliente: ${clientName}
+
+` +
+        `Pedido:
+${productsText}
+
+` +
+        `Total: ${formatMoney(getTotal())}
+
+` +
+        `Datos para el envío:
+` +
+        `Ubicación de Google Maps: ${googleMapsLink || 'No compartida'}
+` +
+        `Dirección escrita: ${address || 'Sin dirección escrita'}
+` +
+        `Referencia: ${reference || 'Sin referencia'}
+
+` +
+        `Gracias!`;
+    }
+
+    function updatePreview() {
+      preview.textContent = buildMessage();
+    }
+
+    function setStatus(message, type = '') {
+      locationStatus.textContent = message;
+      locationStatus.className = 'status ' + type;
+    }
+
+    function saveData() {
+      const data = {
+        clientName: clientNameInput.value,
+        address: addressInput.value,
+        reference: referenceInput.value,
+        googleMapsLink
+      };
+      localStorage.setItem('falahbar_shipping_demo', JSON.stringify(data));
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem('falahbar_shipping_demo');
+        if (!raw) return;
+
+        const data = JSON.parse(raw);
+        clientNameInput.value = data.clientName || '';
+        addressInput.value = data.address || '';
+        referenceInput.value = data.reference || '';
+        googleMapsLink = data.googleMapsLink || '';
+
+        if (googleMapsLink) {
+          mapLink.href = googleMapsLink;
+          mapLink.style.display = 'inline-block';
+          setStatus('Ubicación guardada y lista para enviarse por WhatsApp.', 'ok');
+        }
+      } catch (error) {
+        console.warn('No se pudo cargar la ubicación guardada.', error);
+      }
+    }
+
+    function requestPosition(options) {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, options);
+      });
+    }
+
+    function getErrorText(error) {
+      if (error.code === error.PERMISSION_DENIED) {
+        return 'No diste permiso de ubicación. Permitilo desde el candadito del navegador y probá otra vez.';
+      }
+
+      if (error.code === error.POSITION_UNAVAILABLE) {
+        return 'El navegador no pudo detectar tu ubicación. Probá desde el celular con GPS/Wi‑Fi activado.';
+      }
+
+      if (error.code === error.TIMEOUT) {
+        return 'La ubicación tardó demasiado. Probá de nuevo desde el celular o con mejor conexión.';
+      }
+
+      return 'No se pudo obtener la ubicación automáticamente.';
+    }
+
+    async function getAutomaticGoogleMapsLink() {
+      if (!navigator.geolocation) {
+        throw new Error('Este navegador no soporta geolocalización.');
+      }
+
+      if (!window.isSecureContext && !isLocalhost()) {
+        throw new Error('La ubicación automática necesita HTTPS o localhost.');
+      }
+
+      let position;
+
+      try {
+        // Intento 1: rápido y compatible, ideal para PC/notebook.
+        position = await requestPosition({
+          enableHighAccuracy: false,
+          timeout: 15000,
+          maximumAge: 60000
+        });
+      } catch (firstError) {
+        // Intento 2: alta precisión, ideal para celular.
+        position = await requestPosition({
+          enableHighAccuracy: true,
+          timeout: 25000,
+          maximumAge: 0
+        });
+      }
+
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      return `https://www.google.com/maps?q=${lat},${lng}`;
+    }
+
+    useLocationBtn.addEventListener('click', async () => {
+      setStatus('Buscando ubicación...', '');
+      useLocationBtn.disabled = true;
+      useLocationBtn.textContent = 'Buscando ubicación...';
+
+      try {
+        googleMapsLink = await getAutomaticGoogleMapsLink();
+
+        mapLink.href = googleMapsLink;
+        mapLink.style.display = 'inline-block';
+
+        setStatus('Listo. El link de Google Maps ya se agregó al mensaje de WhatsApp.', 'ok');
+        saveData();
+        updatePreview();
+      } catch (error) {
+        console.error(error);
+
+        const message = error.code ? getErrorText(error) : error.message;
+        setStatus(message, 'error');
+      } finally {
+        useLocationBtn.disabled = false;
+        useLocationBtn.textContent = '📍 Usar mi ubicación actual';
+      }
+    });
+
+    clearLocationBtn.addEventListener('click', () => {
+      googleMapsLink = '';
+      mapLink.href = '#';
+      mapLink.style.display = 'none';
+      setStatus('Ubicación eliminada. Volvé a tocar el botón para generar otra.', '');
+      saveData();
+      updatePreview();
+    });
+
+    sendBtn.addEventListener('click', () => {
+      if (!googleMapsLink) {
+        setStatus('Primero tocá “Usar mi ubicación actual” para generar el link de Google Maps.', 'error');
+        return;
+      }
+
+      const message = buildMessage();
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    });
+
+    [clientNameInput, addressInput, referenceInput].forEach(input => {
+      input.addEventListener('input', () => {
+        saveData();
+        updatePreview();
+      });
+    });
+
+    loadData();
+    updatePreview();
+  </script>
+</body>
+</html>
